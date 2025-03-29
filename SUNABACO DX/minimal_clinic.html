@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>超シンプル美容皮膚科カルテ</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .header { background: #5b86e5; color: white; padding: 20px; text-align: center; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .button { background: #5b86e5; color: white; border: none; padding: 10px 15px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; }
+        table, th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>美容皮膚科 患者カルテシステム</h1>
+    </div>
+
+    <div class="container">
+        <h2>患者一覧</h2>
+        <div id="patients-list"></div>
+
+        <h2>新規患者登録</h2>
+        <div class="card">
+            <form id="patient-form">
+                <p>
+                    <label>患者名: <input type="text" id="patient-name" required></label>
+                </p>
+                <p>
+                    <label>診察券番号: <input type="text" id="patient-id" required></label>
+                </p>
+                <p>
+                    <label>電話番号: <input type="text" id="patient-phone"></label>
+                </p>
+                <p>
+                    <label>メモ:<br><textarea id="patient-notes" rows="3" cols="40"></textarea></label>
+                </p>
+                <p>
+                    <button type="submit" class="button">登録</button>
+                </p>
+            </form>
+        </div>
+
+        <div id="patient-details" style="display:none;">
+            <h2>患者詳細</h2>
+            <div class="card">
+                <h3 id="detail-name"></h3>
+                <p>診察券番号: <span id="detail-id"></span></p>
+                <p>電話番号: <span id="detail-phone"></span></p>
+                <p>メモ: <span id="detail-notes"></span></p>
+            </div>
+
+            <h3>施術履歴</h3>
+            <button id="add-treatment-btn" class="button">施術を追加</button>
+            
+            <div id="treatment-form-area" style="display:none;" class="card">
+                <form id="treatment-form">
+                    <p>
+                        <label>施術日: <input type="date" id="treatment-date" required></label>
+                    </p>
+                    <p>
+                        <label>施術タイプ: 
+                            <select id="treatment-type" required>
+                                <option value="">選択してください</option>
+                                <option value="ボトックス注射">ボトックス注射</option>
+                                <option value="ヒアルロン酸注入">ヒアルロン酸注入</option>
+                                <option value="レーザー治療">レーザー治療</option>
+                                <option value="ケミカルピーリング">ケミカルピーリング</option>
+                                <option value="その他">その他</option>
+                            </select>
+                        </label>
+                    </p>
+                    <p>
+                        <label>詳細:<br><textarea id="treatment-details" rows="2" cols="40"></textarea></label>
+                    </p>
+                    <p>
+                        <button type="submit" class="button">保存</button>
+                        <button type="button" id="cancel-treatment-btn">キャンセル</button>
+                    </p>
+                </form>
+            </div>
+            
+            <table id="treatments-table">
+                <thead>
+                    <tr>
+                        <th>日付</th>
+                        <th>タイプ</th>
+                        <th>詳細</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="treatments-list"></tbody>
+            </table>
+            
+            <p>
+                <button id="back-to-list" class="button">患者一覧に戻る</button>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // 基本データ
+        let patients = [];
+        let currentPatientId = null;
+
+        // 初期データを作成
+        function createInitialData() {
+            return [
+                {
+                    id: "PT001",
+                    name: "山田 花子",
+                    phone: "090-1234-5678",
+                    notes: "アレルギー：金属",
+                    treatments: [
+                        {
+                            id: "TR001",
+                            date: "2025-03-01",
+                            type: "ボトックス注射",
+                            details: "額と眉間に合計20単位"
+                        }
+                    ]
+                },
+                {
+                    id: "PT002",
+                    name: "佐藤 健太",
+                    phone: "080-9876-5432",
+                    notes: "土日のみ来院可能",
+                    treatments: []
+                }
+            ];
+        }
+
+        // ページ読み込み時の処理
+        window.onload = function() {
+            // データ読み込み
+            try {
+                const savedData = localStorage.getItem('clinicData');
+                if (savedData) {
+                    patients = JSON.parse(savedData);
+                } else {
+                    patients = createInitialData();
+                    saveData();
+                }
+            } catch (e) {
+                patients = createInitialData();
+            }
+            
+            // 患者一覧表示
+            showPatientsList();
+            
+            // 新規患者登録フォーム
+            document.getElementById('patient-form').onsubmit = function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('patient-name').value;
+                const id = document.getElementById('patient-id').value;
+                const phone = document.getElementById('patient-phone').value;
+                const notes = document.getElementById('patient-notes').value;
+                
+                if (!name || !id) {
+                    alert('名前と診察券番号は必須です');
+                    return;
+                }
+                
+                // 重複チェック
+                if (patients.some(p => p.id === id)) {
+                    alert('この診察券番号は既に使用されています');
+                    return;
+                }
+                
+                // 患者を追加
+                patients.push({
+                    id: id,
+                    name: name,
+                    phone: phone,
+                    notes: notes,
+                    treatments: []
+                });
+                
+                // 保存とリスト更新
+                saveData();
+                showPatientsList();
+                
+                // フォームクリア
+                this.reset();
+                
+                alert('患者を登録しました');
+            };
+            
+            // 戻るボタン
+            document.getElementById('back-to-list').onclick = function() {
+                document.getElementById('patient-details').style.display = 'none';
+                document.getElementById('patients-list').style.display = 'block';
+                currentPatientId = null;
+            };
+            
+            // 施術追加ボタン
+            document.getElementById('add-treatment-btn').onclick = function() {
+                document.getElementById('treatment-form-area').style.display = 'block';
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('treatment-date').value = today;
+            };
+            
+            // 施術キャンセルボタン
+            document.getElementById('cancel-treatment-btn').onclick = function() {
+                document.getElementById('treatment-form-area').style.display = 'none';
+                document.getElementById('treatment-form').reset();
+            };
+            
+            // 施術追加フォーム
+            document.getElementById('treatment-form').onsubmit = function(e) {
+                e.preventDefault();
+                
+                if (!currentPatientId) return;
+                
+                const date = document.getElementById('treatment-date').value;
+                const type = document.getElementById('treatment-type').value;
+                const details = document.getElementById('treatment-details').value;
+                
+                if (!date || !type) {
+                    alert('施術日と施術タイプは必須です');
+                    return;
+                }
+                
+                // 患者を見つける
+                const patientIndex = patients.findIndex(p => p.id === currentPatientId);
+                if (patientIndex === -1) return;
+                
+                // 施術IDを作成
+                const treatmentId = 'TR' + (patients[patientIndex].treatments.length + 1).toString().padStart(3, '0');
+                
+                // 施術を追加
+                patients[patientIndex].treatments.push({
+                    id: treatmentId,
+                    date: date,
+                    type: type,
+                    details: details
+                });
+                
+                // 保存とリスト更新
+                saveData();
+                showPatientDetails(currentPatientId);
+                
+                // フォームを隠してリセット
+                document.getElementById('treatment-form-area').style.display = 'none';
+                this.reset();
+            };
+        };
+        
+        // データをlocalStorageに保存
+        function saveData() {
+            try {
+                localStorage.setItem('clinicData', JSON.stringify(patients));
+            } catch (e) {
+                alert('データの保存中にエラーが発生しました');
+            }
+        }
+        
+        // 患者一覧表示
+        function showPatientsList() {
+            const container = document.getElementById('patients-list');
+            container.innerHTML = '';
+            
+            patients.forEach(patient => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                
+                card.innerHTML = `
+                    <h3>${patient.name}</h3>
+                    <p>診察券番号: ${patient.id}</p>
+                    <p>電話番号: ${patient.phone || '未登録'}</p>
+                    <p>施術回数: ${patient.treatments.length}回</p>
+                    <button class="view-btn button" data-id="${patient.id}">詳細を見る</button>
+                `;
+                
+                container.appendChild(card);
+            });
+            
+            // 詳細ボタンにイベント設定
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const id = this.getAttribute('data-id');
+                    showPatientDetails(id);
+                };
+            });
+        }
+        
+        // 患者詳細表示
+        function showPatientDetails(patientId) {
+            const patient = patients.find(p => p.id === patientId);
+            if (!patient) return;
+            
+            currentPatientId = patientId;
+            
+            // 患者情報を表示
+            document.getElementById('detail-name').textContent = patient.name;
+            document.getElementById('detail-id').textContent = patient.id;
+            document.getElementById('detail-phone').textContent = patient.phone || '未登録';
+            document.getElementById('detail-notes').textContent = patient.notes || 'なし';
+            
+            // 施術履歴を表示
+            const treatmentsList = document.getElementById('treatments-list');
+            treatmentsList.innerHTML = '';
+            
+            if (patient.treatments.length === 0) {
+                treatmentsList.innerHTML = '<tr><td colspan="4">施術履歴がありません</td></tr>';
+            } else {
+                patient.treatments.forEach(treatment => {
+                    const tr = document.createElement('tr');
+                    
+                    tr.innerHTML = `
+                        <td>${formatDate(treatment.date)}</td>
+                        <td>${treatment.type}</td>
+                        <td>${treatment.details || '-'}</td>
+                        <td>
+                            <button class="delete-btn" data-id="${treatment.id}">削除</button>
+                        </td>
+                    `;
+                    
+                    treatmentsList.appendChild(tr);
+                });
+                
+                // 削除ボタンにイベント設定
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.onclick = function() {
+                        if (confirm('この施術記録を削除しますか？')) {
+                            const treatmentId = this.getAttribute('data-id');
+                            deleteTreatment(patientId, treatmentId);
+                        }
+                    };
+                });
+            }
+            
+            // 詳細エリアを表示、リストを非表示
+            document.getElementById('patient-details').style.display = 'block';
+            document.getElementById('patients-list').style.display = 'none';
+        }
+        
+        // 施術記録削除
+        function deleteTreatment(patientId, treatmentId) {
+            const patientIndex = patients.findIndex(p => p.id === patientId);
+            if (patientIndex === -1) return;
+            
+            const treatments = patients[patientIndex].treatments;
+            const treatmentIndex = treatments.findIndex(t => t.id === treatmentId);
+            if (treatmentIndex === -1) return;
+            
+            treatments.splice(treatmentIndex, 1);
+            saveData();
+            showPatientDetails(patientId);
+        }
+        
+        // 日付フォーマット
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Date(dateString).toLocaleDateString('ja-JP', options);
+        }
+    </script>
+</body>
+</html>
