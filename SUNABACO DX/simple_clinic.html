@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美容皮膚科 患者カルテシステム</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* モダンなカスタムスタイル */
+        :root {
+            --primary-color: #7e57c2;
+            --secondary-color: #b388ff;
+            --accent-color: #ff8a65;
+            --light-bg: #f7f9fc;
+            --dark-text: #424242;
+            --light-text: #f7f9fc;
+            --border-radius: 12px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.7;
+        }
+        
+        .bg-gradient {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bg-gradient::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0.2) 0%,
+                rgba(255, 255, 255, 0.05) 40%,
+                rgba(255, 255, 255, 0) 60%
+            );
+            transform: rotate(-30deg);
+            pointer-events: none;
+        }
+        
+        .card {
+            border: none;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            background-color: white;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.2rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            box-shadow: 0 4px 15px rgba(126, 87, 194, 0.3);
+            transition: var(--transition);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(126, 87, 194, 0.4);
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 50px;
+            transition: var(--transition);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #ededed;
+            color: var(--dark-text);
+            border: none;
+            border-radius: 50px;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .nav-tabs {
+            border-bottom: none;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 0.7rem 1.5rem;
+            color: var(--dark-text);
+            transition: var(--transition);
+        }
+        
+        .nav-tabs .nav-link:hover {
+            background-color: rgba(126, 87, 194, 0.05);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgba(126, 87, 194, 0.1);
+            border-bottom: none;
+            font-weight: 500;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.7rem 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(126, 87, 194, 0.15);
+        }
+        
+        .table {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .table th {
+            background-color: rgba(126, 87, 194, 0.05);
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .badge {
+            padding: 0.55em 0.8em;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        .modal-content {
+            border: none;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            border-bottom: none;
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 1.5rem;
+        }
+        
+        /* アニメーション */
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .tab-pane.show {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        /* 検索フィールド */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+        
+        #patient-search {
+            padding-left: 2.5rem;
+            border-radius: 50px;
+        }
+        
+        /* ログイン画面 */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-bg);
+            padding: 2rem;
+        }
+        
+        .login-card {
+            max-width: 450px;
+            width: 100%;
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .login-header {
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+        
+        .login-body {
+            padding: 2rem;
+        }
+        
+        .login-footer {
+            background-color: rgba(0, 0, 0, 0.03);
+            padding: 1rem 2rem;
+            text-align: center;
+        }
+        
+        .avatar-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .user-dropdown {
+            position: relative;
+        }
+        
+        .user-dropdown .dropdown-menu {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        /* レスポンシブ調整 */
+        @media (max-width: 768px) {
+            .card-header {
+                padding: 1rem;
+            }
+            
+            .card-body {
+                padding: 1.2rem;
+            }
+            
+            .modal-header, .modal-footer {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="login-view" style="display: none;">
+        <div class="login-container">
+            <div class="card login-card">
+                <div class="bg-gradient login-header">
+                    <div class="avatar-circle">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h2>美容皮膚科</h2>
+                    <p class="mb-0">患者カルテシステム</p>
+                </div>
+                <div class="login-body">
+                    <form id="login-form">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">ユーザー名</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control" id="username" required>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">パスワード</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                <input type="password" class="form-control" id="password" required>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">ログイン</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="login-footer">
+                    <p class="mb-0 small text-muted">ユーザー名: admin / パスワード: admin</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインコンテンツ（ログイン後表示） -->
+    <div id="main-content" style="display: none;">
+        <div class="container-fluid p-0">
+            <!-- ヘッダー -->
+            <header class="bg-gradient text-dark text-center py-4 mb-4">
+                <div class="container d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1><i class="fas fa-spa me-2"></i>美容皮膚科 患者カルテシステム</h1>
+                        <p class="text-light mb-0">Beauty Clinic Patient Record System</p>
+                    </div>
+                    <div class="user-dropdown">
+                        <button class="btn btn-light rounded-circle" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><h6 class="dropdown-header" id="current-user">ログインユーザー</h6></li>
+                            <li><a class="dropdown-item" href="#" id="logout-btn"><i class="fas fa-sign-out-alt me-2"></i>ログアウト</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </header>
+
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-lg-6">
+                        <div class="search-container mb-3">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="patient-search" class="form-control" placeholder="患者名または診察券番号で検索...">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-lg-end">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+                            <i class="fas fa-user-plus me-2"></i>新規患者登録
+                        </button>
+                    </div>
+                </div>
+
+                <!-- タブナビゲーション -->
+                <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab">
+                            <i class="fas fa-users me-2"></i>患者一覧
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- タブコンテンツ -->
+                <div class="tab-content" id="myTabContent">
+                    <!-- 患者一覧タブ -->
+                    <div class="tab-pane fade show active" id="patients" role="tabpanel">
+                        <div class="row" id="patient-list">
+                            <!-- 患者カードが動的に追加されます -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 新規患者追加モーダル -->
+    <div class="modal fade" id="addPatientModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient">
+                    <h5 class="modal-title text-white"><i class="fas fa-user-plus me-2"></i>新規患者登録</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-patient-form">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">患者名 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="patientId" class="form-label">診察券番号 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="patientId" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="birthdate" class="form-label">生年月日</label>
+                            <input type="date" class="form-control" id="birthdate">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">電話番号</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">メモ</label>
+                            <textarea class="form-control" id="notes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-primary" id="save-patient">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 患者詳細モーダル -->
+    <div class="modal fade" id="patientDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient">
+                    <h5 class="modal-title text-white"><i class="fas fa-user me-2"></i><span id="detail-patient-name"></span></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0"><i class="fas fa-id-card me-2"></i>基本情報</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>診察券番号:</strong> <span id="detail-patient-id"></span></p>
+                                    <p><strong>生年月日:</strong> <span id="detail-patient-birthdate"></span></p>
+                                    <p><strong>電話番号:</strong> <span id="detail-patient-phone"></span></p>
+                                    <p><strong>メモ:</strong> <span id="detail-patient-notes"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0"><i class="fas fa-clipboard-list me-2"></i>施術履歴</h6>
+                                    <button class="btn btn-sm btn-primary" id="add-treatment-btn">
+                                        <i class="fas fa-plus me-1"></i> 施術追加
+                                    </button>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="list-group list-group-flush" id="treatment-list">
+                                        <!-- 施術履歴がここに表示されます -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 施術追加モーダル -->
+    <div class="modal fade" id="addTreatmentModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient">
+                    <h5 class="modal-title text-white"><i class="fas fa-plus-circle me-2"></i>施術記録追加</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-treatment-form">
+                        <div class="mb-3">
+                            <label for="treatmentDate" class="form-label">施術日 <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="treatmentDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="treatmentType" class="form-label">施術タイプ <span class="text-danger">*</span></label>
+                            <select class="form-select" id="treatmentType" required>
+                                <option value="" selected disabled>選択してください</option>
+                                <option value="ボトックス注射">ボトックス注射</option>
+                                <option value="ヒアルロン酸注入">ヒアルロン酸注入</option>
+                                <option value="レーザー治療">レーザー治療</option>
+                                <option value="ケミカルピーリング">ケミカルピーリング</option>
+                                <option value="その他">その他</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="treatmentDetails" class="form-label">詳細</label>
+                            <textarea class="form-control" id="treatmentDetails" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                    <button type="button" class="btn btn-primary" id="save-treatment">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // データモデル
+        let patients = [];
+        let currentPatientId = null;
+        
+        // 初期データ（デモ用）
+        function createInitialPatients() {
+            return [
+                {
+                    id: "P001",
+                    name: "山田 花子",
+                    birthdate: "1985-07-15",
+                    phone: "090-1234-5678",
+                    notes: "アレルギー：ペニシリン",
+                    treatments: [
+                        {
+                            id: "T001",
+                            date: "2025-03-15",
+                            type: "ボトックス注射",
+                            details: "額と眉間に合計20単位",
+                            notes: ""
+                        },
+                        {
+                            id: "T002",
+                            date: "2025-02-01",
+                            type: "ヒアルロン酸注入",
+                            details: "ほうれい線 1.0ml",
+                            notes: ""
+                        }
+                    ]
+                },
+                {
+                    id: "P002",
+                    name: "佐藤 健太",
+                    birthdate: "1977-11-23",
+                    phone: "080-9876-5432",
+                    notes: "敏感肌",
+                    treatments: [
+                        {
+                            id: "T003",
+                            date: "2025-03-10",
+                            type: "レーザー治療",
+                            details: "シミ除去 頬部分",
+                            notes: ""
+                        }
+                    ]
+                },
+                {
+                    id: "P003",
+                    name: "鈴木 美咲",
+                    birthdate: "1992-04-08",
+                    phone: "070-1111-2222",
+                    notes: "",
+                    treatments: []
+                }
+            ];
+        }
+        
+        // localStorage からデータを読み込む
+        function loadPatientsFromStorage() {
+            try {
+                const storedPatients = localStorage.getItem('beautyClinicPatients');
+                if (storedPatients) {
+                    patients = JSON.parse(storedPatients);
+                } else {
+                    // 初期データを設定
+                    patients = createInitialPatients();
+                    savePatientsToStorage();
+                }
+            } catch (error) {
+                console.error('データの読み込みに失敗しました:', error);
+                patients = createInitialPatients();
+            }
+        }
+        
+        // localStorage にデータを保存
+        function savePatientsToStorage() {
+            try {
+                localStorage.setItem('beautyClinicPatients', JSON.stringify(patients));
+            } catch (error) {
+                console.error('データの保存に失敗しました:', error);
+                alert('データの保存中にエラーが発生しました。');
+            }
+        }
+        
+        // 日付のフォーマット
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            return new Date(dateString).toLocaleDateString('ja-JP', options);
+        }
+        
+        // 患者一覧を表示
+        function displayPatients(filteredPatients = null) {
+            const patientsToDisplay = filteredPatients || patients;
+            const container = document.getElementById('patient-list');
+            
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            if (patientsToDisplay.length === 0) {
+                container.innerHTML = '<div class="col-12"><div class="alert alert-info">患者が登録されていません。</div></div>';
+                return;
+            }
+            
+            patientsToDisplay.forEach(patient => {
+                // 施術回数をカウント
+                const treatmentCount = patient.treatments ? patient.treatments.length : 0;
+                
+                // 最新の施術日
+                let lastTreatmentDate = '-';
+                if (treatmentCount > 0) {
+                    const sortedTreatments = [...patient.treatments].sort((a, b) => new Date(b.date) - new Date(a.date));
+                    lastTreatmentDate = formatDate(sortedTreatments[0].date);
+                }
+                
+                const col = document.createElement('div');
+                col.className = 'col-md-6 col-lg-4 mb-4';
+                
+                col.innerHTML = `
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${patient.name}</h5>
+                            <span class="badge bg-primary">#${patient.id}</span>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><i class="fas fa-calendar-alt me-2"></i>生年月日: ${formatDate(patient.birthdate) || '未登録'}</p>
+                            <p class="mb-2"><i class="fas fa-phone me-2"></i>電話: ${patient.phone || '未登録'}</p>
+                            <p class="mb-2"><i class="fas fa-clipboard-list me-2"></i>施術回数: ${treatmentCount}回</p>
+                            <p class="mb-0"><i class="fas fa-history me-2"></i>最終施術: ${lastTreatmentDate}</p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <button class="btn btn-outline-primary w-100 view-patient" data-patient-id="${patient.id}">
+                                <i class="fas fa-user me-2"></i>患者詳細を見る
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(col);
+                
+                // 詳細ボタンのイベントリスナー
+                const viewButton = col.querySelector('.view-patient');
+                if (viewButton) {
+                    viewButton.addEventListener('click', () => {
+                        viewPatientDetails(patient.id);
+                    });
+                }
+            });
+        }
+        
+        // 患者詳細を表示
+        function viewPatientDetails(patientId) {
+            currentPatientId = patientId;
+            const patient = patients.find(p => p.id === patientId);
+            if (!patient) return;
+            
+            // モーダルにデータをセット
+            document.getElementById('detail-patient-name').textContent = patient.name;
+            document.getElementById('detail-patient-id').textContent = patient.id;
+            document.getElementById('detail-patient-birthdate').textContent = patient.birthdate ? formatDate(patient.birthdate) : '未登録';
+            document.getElementById('detail-patient-phone').textContent = patient.phone || '未登録';
+            document.getElementById('detail-patient-notes').textContent = patient.notes || 'メモなし';
+            
+            // 施術リストを表示
+            displayTreatments(patient);
+            
+            // モーダルを表示
+            const patientModal = document.getElementById('patientDetailModal');
+            if (patientModal) {
+                const modal = new bootstrap.Modal(patientModal);
+                modal.show();
+            }
+        }
+
+        // 施術履歴を表示
+        function displayTreatments(patient) {
+            const treatmentsList = document.getElementById('treatment-list');
+            if (!treatmentsList) return;
+            
+            treatmentsList.innerHTML = '';
+            
+            if (!patient.treatments || patient.treatments.length === 0) {
+                treatmentsList.innerHTML = '<li class="list-group-item text-center py-3">施術履歴がありません</li>';
+                return;
+            }
+            
+            // 日付順に並べ替え（新しい順）
+            const sortedTreatments = [...patient.treatments].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTreatments.forEach(treatment => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-medium">${formatDate(treatment.date)}</span>
+                        <span class="badge bg-primary">${treatment.type}</span>
+                    </div>
+                    <p class="mt-2 mb-1">${treatment.details || '-'}</p>
+                    <div class="text-end">
+                        <button class="btn btn-sm btn-outline-danger delete-treatment-btn" data-treatment-id="${treatment.id}">
+                            <i class="fas fa-trash-alt me-1"></i>削除
+                        </button>
+                    </div>
+                `;
+                
+                treatmentsList.appendChild(li);
+                
+                // 削除ボタンのイベントリスナー
+                const deleteBtn = li.querySelector('.delete-treatment-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        if (confirm('この施術記録を削除してもよろしいですか？')) {
+                            deleteTreatment(patient.id, treatment.id);
+                        }
+                    });
+                }
+            });
+        }
+        
+        // 施術記録を削除
+        function deleteTreatment(patientId, treatmentId) {
+            const patientIndex = patients.findIndex(p => p.id === patientId);
+            
+            if (patientIndex === -1) return;
+            
+            const treatmentIndex = patients[patientIndex].treatments.findIndex(t => t.id === treatmentId);
+            
+            if (treatmentIndex === -1) return;
+            
+            patients[patientIndex].treatments.splice(treatmentIndex, 1);
+            savePatientsToStorage();
+            
+            // 患者詳細モーダルを更新
+            displayTreatments(patients[patientIndex]);
+            
+            // 患者一覧も更新（施術件数が変わるため）
+            displayPatients();
+        }
+
+        // DOMが読み込まれたときの処理
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                // データを読み込み
+                loadPatientsFromStorage();
+                
+                // ログイン画面を表示
+                document.getElementById('login-view').style.display = 'block';
+                
+                // ログインフォームの送信
+                const loginForm = document.getElementById('login-form');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        
+                        const usernameInput = document.getElementById('username');
+                        const passwordInput = document.getElementById('password');
+                        
+                        if (!usernameInput || !passwordInput) return;
+                        
+                        // ログイン処理
+                        if (usernameInput.value === 'admin' && passwordInput.value === 'admin') {
+                            // ログイン成功
+                            document.getElementById('login-view').style.display = 'none';
+                            document.getElementById('main-content').style.display = 'block';
+                            document.getElementById('current-user').textContent = '管理者';
+                        } else {
+                            alert('ユーザー名またはパスワードが間違っています。');
+                        }
+                    });
+                }
+                
+                // ログアウトボタンのイベントリスナー
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', () => {
+                        // ログアウト処理
+                        document.getElementById('login-view').style.display = 'block';
+                        document.getElementById('main-content').style.display = 'none';
+                    });
+                }
+                
+                // 患者一覧を表示
+                displayPatients();
+                
+                // 検索機能
+                const searchInput = document.getElementById('patient-search');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const searchTerm = e.target.value.toLowerCase().trim();
+                        
+                        if (searchTerm === '') {
+                            displayPatients();
+                            return;
+                        }
+                        
+                        const filteredPatients = patients.filter(patient => 
+                            patient.name.toLowerCase().includes(searchTerm) || 
+                            patient.id.toLowerCase().includes(searchTerm)
+                        );
+                        
+                        displayPatients(filteredPatients);
+                    });
+                }
+                
+                // 患者登録フォームの設定
+                const savePatientBtn = document.getElementById('save-patient');
+                if (savePatientBtn) {
+                    savePatientBtn.addEventListener('click', () => {
+                        const nameInput = document.getElementById('name');
+                        const idInput = document.getElementById('patientId');
+                        const birthdateInput = document.getElementById('birthdate');
+                        const phoneInput = document.getElementById('phone');
+                        const notesInput = document.getElementById('notes');
+                        
+                        if (!nameInput || !idInput) return;
+                        
+                        // 入力バリデーション
+                        if (!nameInput.value.trim() || !idInput.value.trim()) {
+                            alert('患者名と診察券番号は必須です。');
+                            return;
+                        }
+                        
+                        // IDの重複チェック
+                        if (patients.some(p => p.id === idInput.value.trim())) {
+                            alert('入力された診察券番号は既に使用されています。');
+                            return;
+                        }
+                        
+                        // 新しい患者オブジェクトを作成
+                        const newPatient = {
+                            id: idInput.value.trim(),
+                            name: nameInput.value.trim(),
+                            birthdate: birthdateInput ? birthdateInput.value : '',
+                            phone: phoneInput ? phoneInput.value.trim() : '',
+                            notes: notesInput ? notesInput.value.trim() : '',
+                            treatments: []
+                        };
+                        
+                        // 患者リストに追加
+                        patients.push(newPatient);
+                        
+                        // 保存して表示を更新
+                        savePatientsToStorage();
+                        displayPatients();
+                        
+                        // フォームをリセット＆モーダルを閉じる
+                        document.getElementById('add-patient-form').reset();
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addPatientModal'));
+                        if (modal) modal.hide();
+                        
+                        alert('患者情報を登録しました。');
+                    });
+                }
+                
+                // 施術追加ボタンのイベントリスナー
+                const addTreatmentBtn = document.getElementById('add-treatment-btn');
+                if (addTreatmentBtn) {
+                    addTreatmentBtn.addEventListener('click', () => {
+                        // 日付欄に今日の日付をセット
+                        const treatmentDate = document.getElementById('treatmentDate');
+                        if (treatmentDate) {
+                            const today = new Date().toISOString().split('T')[0];
+                            treatmentDate.value = today;
+                        }
+                        
+                        const modal = new bootstrap.Modal(document.getElementById('addTreatmentModal'));
+                        modal.show();
+                    });
+                }
+                
+                // 施術追加フォームの送信
+                const saveTreatmentBtn = document.getElementById('save-treatment');
+                if (saveTreatmentBtn) {
+                    saveTreatmentBtn.addEventListener('click', () => {
+                        if (!currentPatientId) return;
+                        
+                        const patientIndex = patients.findIndex(p => p.id === currentPatientId);
+                        if (patientIndex === -1) return;
+                        
+                        const dateInput = document.getElementById('treatmentDate');
+                        const typeInput = document.getElementById('treatmentType');
+                        const detailsInput = document.getElementById('treatmentDetails');
+                        
+                        if (!dateInput || !typeInput) return;
+                        
+                        // 入力バリデーション
+                        if (!dateInput.value || !typeInput.value) {
+                            alert('施術日と施術タイプは必須です。');
+                            return;
+                        }
+                        
+                        // 施術IDを生成
+                        const treatmentId = 'T' + Date.now().toString().slice(-6);
+                        
+                        // 新しい施術オブジェクトを作成
+                        const newTreatment = {
+                            id: treatmentId,
+                            date: dateInput.value,
+                            type: typeInput.value,
+                            details: detailsInput ? detailsInput.value : '',
+                            notes: ''
+                        };
+                        
+                        patients[patientIndex].treatments.push(newTreatment);
+                        
+                        // 保存して表示を更新
+                        savePatientsToStorage();
+                        displayTreatments(patients[patientIndex]);
+                        displayPatients();
+                        
+                        // フォームをリセットしてモーダルを閉じる
+                        document.getElementById('add-treatment-form').reset();
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('addTreatmentModal'));
+                        if (modal) modal.hide();
+                        
+                        alert('施術記録を追加しました。');
+                    });
+                }
+            } catch (e) {
+                console.error('エラーが発生しました:', e);
+            }
+        });
+    </script>
+</body>
+</html>

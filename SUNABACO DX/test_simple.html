@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動作確認テスト</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #4a6eb5;
+            text-align: center;
+        }
+        button {
+            background-color: #4a6eb5;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #4a6eb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ブラウザ動作確認テスト</h1>
+        <p>このページはブラウザで直接開くことができ、サーバーを必要としません。下のボタンをクリックして基本的な機能をテストできます。</p>
+        
+        <button id="testButton">機能テスト実行</button>
+        
+        <div class="result" id="testResult">
+            テスト結果がここに表示されます。
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('testButton').addEventListener('click', function() {
+            // 基本的なJavaScript機能のテスト
+            const testResult = document.getElementById('testResult');
+            
+            try {
+                // 1. localStorage のテスト
+                localStorage.setItem('testKey', 'テスト成功！');
+                const testValue = localStorage.getItem('testKey');
+                
+                // 2. JSON処理のテスト
+                const testObject = { name: 'テスト患者', id: 'TEST001' };
+                const jsonString = JSON.stringify(testObject);
+                const parsedObject = JSON.parse(jsonString);
+                
+                // 3. DOM操作のテスト
+                const newElement = document.createElement('p');
+                newElement.textContent = '動的に追加された要素';
+                testResult.appendChild(newElement);
+                
+                // 4. 日付処理のテスト
+                const now = new Date();
+                const formattedDate = now.toLocaleDateString('ja-JP');
+                
+                // テスト結果の表示
+                let resultHTML = '<h3>テスト結果: 成功 ✅</h3>';
+                resultHTML += '<ul>';
+                resultHTML += `<li>localStorage: ${testValue}</li>`;
+                resultHTML += `<li>JSON処理: ${parsedObject.name} (ID: ${parsedObject.id})</li>`;
+                resultHTML += `<li>日付処理: ${formattedDate}</li>`;
+                resultHTML += '</ul>';
+                resultHTML += '<p>すべてのブラウザ機能が正常に動作しています。美容皮膚科患者カルテシステムを利用できます。</p>';
+                
+                testResult.innerHTML = resultHTML;
+            } catch (error) {
+                testResult.innerHTML = `<h3>テスト結果: 失敗 ❌</h3><p>エラー内容: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

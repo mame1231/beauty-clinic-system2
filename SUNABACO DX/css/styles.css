@@ -1,0 +1,219 @@
+/* 全体のスタイル */
+:root {
+    --primary-color: #5b86e5;
+    --secondary-color: #36d1dc;
+    --light-bg: #f8f9fa;
+    --dark-text: #343a40;
+    --light-text: #f8f9fa;
+}
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f7fa;
+    color: var(--dark-text);
+}
+
+/* ヘッダーのグラデーション */
+.bg-gradient {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* カードのスタイル */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    border-bottom: none;
+    padding: 1rem 1.25rem;
+}
+
+/* ボタンのスタイル */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: none;
+    box-shadow: 0 2px 5px rgba(91, 134, 229, 0.3);
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #4a75d4, #28c0cb);
+    box-shadow: 0 5px 15px rgba(91, 134, 229, 0.5);
+}
+
+/* ナビタブのスタイル */
+.nav-tabs .nav-link {
+    color: var(--dark-text);
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 500;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--primary-color);
+    background-color: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    border-color: transparent;
+    border-bottom: 3px solid var(--secondary-color);
+}
+
+/* 患者カードのスタイル */
+.patient-card {
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.patient-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(91, 134, 229, 0.2);
+}
+
+.patient-card .card-body {
+    padding: 1.5rem;
+}
+
+/* テーブルのスタイル */
+.table th {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(91, 134, 229, 0.05);
+}
+
+/* モーダルのスタイル */
+.modal-content {
+    border: none;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .card-header h5 {
+        font-size: 1rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+}
+
+/* フェードイン・アニメーション */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-pane.active {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* モダンなフォーム要素 */
+.form-control, .form-select {
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(91, 134, 229, 0.25);
+}
+
+/* 患者詳細セクションのスタイル */
+#modal-patient-notes, #treatment-notes {
+    min-height: 100px;
+}
+
+/* 患者検索フィールド */
+#patient-search {
+    border-radius: 0.375rem 0 0 0.375rem;
+}
+
+#search-button {
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+/* ローディングスピナー */
+.spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.2em;
+}
+
+/* 施術タイプのバッジ */
+.treatment-badge {
+    font-size: 0.8rem;
+    font-weight: normal;
+    padding: 0.35em 0.65em;
+    border-radius: 10rem;
+}
+
+/* ボトックス注射 */
+.treatment-botox {
+    background-color: #8e44ad;
+    color: white;
+}
+
+/* ヒアルロン酸注入 */
+.treatment-filler {
+    background-color: #3498db;
+    color: white;
+}
+
+/* レーザー治療 */
+.treatment-laser {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* ケミカルピーリング */
+.treatment-peeling {
+    background-color: #f39c12;
+    color: white;
+}
+
+/* 美容点滴 */
+.treatment-iv {
+    background-color: #2ecc71;
+    color: white;
+}
+
+/* フェイシャルエステ */
+.treatment-facial {
+    background-color: #1abc9c;
+    color: white;
+}
+
+/* その他 */
+.treatment-other {
+    background-color: #7f8c8d;
+    color: white;
+}

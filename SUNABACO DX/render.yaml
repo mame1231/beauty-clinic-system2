@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: beauty-clinic-system
+    runtime: static
+    buildCommand: echo "No build command needed for static site"
+    staticPublishPath: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: "public, max-age=0, must-revalidate"
